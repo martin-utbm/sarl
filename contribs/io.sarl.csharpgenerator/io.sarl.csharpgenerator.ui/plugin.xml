@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="io.sarl.lang.ui.extraGenerators">
+      <extraGenerator
+            preferences="io.sarl.csharpgenerator.ui.CsharpExecutableExtensionFactory:io.sarl.csharpgenerator.ui.configuration.CsharpPreferenceInitializer"
+            generator="io.sarl.csharpgenerator.ui.CsharpExecutableExtensionFactory:io.sarl.csharpgenerator.ui.generator.CsharpGeneratorProvider"
+            validator="io.sarl.csharpgenerator.ui.CsharpExecutableExtensionFactory:io.sarl.csharpgenerator.ui.validator.CsharpValidatorProvider"
+            outputConfiguration="io.sarl.csharpgenerator.ui.CsharpExecutableExtensionFactory:io.sarl.csharpgenerator.generator.configuration.CsharpOutputConfigurationProvider"
+            keywords="io.sarl.csharpgenerator.ui.CsharpExecutableExtensionFactory:io.sarl.csharpgenerator.generator.generator.CsharpKeywordProvider">
+      </extraGenerator>
+   </extension>
+
+	 <extension
+	       point="org.eclipse.ui.preferencePages">
+	    <page
+	          category="io.sarl.lang.SARL.compiler.preferencePage"
+	          class="io.sarl.csharpgenerator.ui.CsharpExecutableExtensionFactory:io.sarl.csharpgenerator.ui.preferences.PropertyPage"
+	          id="io.sarl.csharpgenerator.ui.preferencePage"
+	          name="%preference.page">
+	    </page>
+	 </extension>
+	 <extension
+	       point="org.eclipse.ui.propertyPages">
+	    <page
+           category="io.sarl.lang.SARL.compiler.propertyPage"
+           class="io.sarl.csharpgenerator.ui.CsharpExecutableExtensionFactory:io.sarl.csharpgenerator.ui.preferences.PropertyPage"
+           id="io.sarl.csharpgenerator.ui.propertyPage"
+           name="%preference.page">
+	        <enabledWhen>
+	            <adapt type="org.eclipse.core.resources.IProject"/>
+			</enabledWhen>
+	        <filter name="projectNature" value="io.sarl.eclipse.SARLProjectNature"/>
+	    </page>
+	 </extension>
+</plugin>
