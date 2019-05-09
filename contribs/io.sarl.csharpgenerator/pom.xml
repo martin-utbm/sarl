@@ -15,6 +15,7 @@
 
 	<modules>
 		<module>io.sarl.csharpgenerator.generator</module>
+		<module>io.sarl.csharpgenerator.generator.tests</module>
 		<module>io.sarl.csharpgenerator.ui</module>
 		<module>io.sarl.csharpgenerator.feature</module>
 	</modules>

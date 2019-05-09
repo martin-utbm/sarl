@@ -1,0 +1,17 @@
+package tests
+
+class Cat {
+	val name : String
+	val bellyCapacity : int
+
+	var bellyContent : int
+	var isGrumpy : boolean
+
+	new(name : String, bellyCapacity : int) {
+		this.name = name
+		this.bellyCapacity = bellyCapacity
+
+		this.bellyContent = bellyCapacity / 2
+		this.isGrumpy = false
+	}
+}
