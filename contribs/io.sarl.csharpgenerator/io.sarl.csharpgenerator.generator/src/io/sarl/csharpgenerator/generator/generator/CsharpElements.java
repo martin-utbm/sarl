@@ -92,6 +92,12 @@ public class CsharpElements {
 		public static final String JAVA_INT = "int ";
 		public static final String JAVA_STRING = "string ";
 		public static final String JAVA_DOUBLE = "double ";
+		public static final String JAVA_BOOLEAN = "boolean ";
+		public static final String JAVA_BYTE = "sbyte ";
+		public static final String JAVA_SHORT = "short ";
+		public static final String JAVA_LONG = "long ";
+		public static final String JAVA_CHAR = "char ";
+		public static final String JAVA_FLOAT = "float ";
 	}
 	
 	//advanced data types equivalences
