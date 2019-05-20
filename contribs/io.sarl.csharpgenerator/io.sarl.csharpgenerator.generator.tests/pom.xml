@@ -8,7 +8,6 @@
 		<version>0.9.0-SNAPSHOT</version>
 	</parent>
 
-	<groupId>io.sarl.csharpgenerator</groupId>
 	<artifactId>io.sarl.csharpgenerator.tests</artifactId>
 
 	<name>C# Compiler Tests</name>
@@ -27,6 +26,12 @@
 		<dependency>
 			<groupId>io.sarl</groupId>
 			<artifactId>io.sarl.util</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jdt</groupId>
+			<artifactId>org.eclipse.jdt.annotation</artifactId>
+			<version>2.0.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
