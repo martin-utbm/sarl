@@ -9,10 +9,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.stream.Stream;
 
-@SuppressWarnings({ "javadoc", "static-method" })
+@SuppressWarnings({ "javadoc", "static-method", "nls" })
 public class CSharpCompilationTest {
-	private static final String TEST_CASE_INPUT_FILE = "input.sarl"; //$NON-NLS-1$
-	private static final String TEST_CASE_OUTPUT_DIRECTORY = "expected-output"; //$NON-NLS-1$
+	private static final String TEST_CASE_INPUT_FILE = "input.sarl";
+	private static final String TEST_CASE_OUTPUT_DIRECTORY = "expected-output";
 	
 	private static final class TestCase {
 		public final String name;
@@ -27,7 +27,7 @@ public class CSharpCompilationTest {
 	}
 	
 	private Stream<TestCase> getTestCases() {
-		final File testCasesContainingDirectory = new File(getClass().getResource(".").getPath()); //$NON-NLS-1$
+		final File testCasesContainingDirectory = new File(getClass().getResource(".").getPath());
 
 		return Stream.of(testCasesContainingDirectory.listFiles(this::isTestCaseDataDirectory))
 			.map(testCaseDirectory -> new TestCase(
@@ -72,7 +72,7 @@ public class CSharpCompilationTest {
 			
 			return fileContent.toString();
 		} catch (IOException _e) {
-			return ""; //$NON-NLS-1$
+			return "";
 		}
 	}
 	
@@ -87,7 +87,7 @@ public class CSharpCompilationTest {
 	}
 
 	private String fromMultilineString(String lines) {
-		return toMultilineString(lines.split("[\r\n]+")); //$NON-NLS-1$
+		return toMultilineString(lines.split("[\r\n]+"));
 	}
 
 	// TODO
@@ -112,25 +112,25 @@ public class CSharpCompilationTest {
 			.toArray(String[]::new);
 		
 		assertArrayEquals(new String[] {
-			"compiling_cat_class_with_properties", //$NON-NLS-1$
-			"compiling_cat_class_with_properties_and_methods", //$NON-NLS-1$
-			"compiling_empty_cat_class" //$NON-NLS-1$
+			"compiling_cat_class_with_properties",
+			"compiling_cat_class_with_properties_and_methods",
+			"compiling_empty_cat_class"
 		}, subFolders);
 	}
 	
 	@Test
 	public void such_input() {
 		String input = getTestCases()
-			.filter(it -> it.name.equals("compiling_empty_cat_class")) //$NON-NLS-1$
+			.filter(it -> it.name.equals("compiling_empty_cat_class"))
 			.findFirst()
 			.get()
 			.input;
 		
 		assertEquals(toMultilineString(
-			"package tests", //$NON-NLS-1$
-			"", //$NON-NLS-1$
-			"class Cat", //$NON-NLS-1$
-			"" //$NON-NLS-1$
+			"package tests",
+			"",
+			"class Cat",
+			""
 		), fromMultilineString(input));
 	}
 }
