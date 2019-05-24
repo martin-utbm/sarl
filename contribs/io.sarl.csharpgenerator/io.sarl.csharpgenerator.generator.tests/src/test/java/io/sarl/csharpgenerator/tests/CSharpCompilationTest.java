@@ -77,10 +77,11 @@ public class CSharpCompilationTest {
 	private String readFileContent(File file) {
 		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
 			StringBuilder fileContent = new StringBuilder();
-			char[] buffer = new char[128];
+			char[] buffer = new char[1024];
+			int count = 0;
 			
-			while (reader.read(buffer) != -1)
-				fileContent.append(buffer);
+			while ((count = reader.read(buffer)) != -1)
+				fileContent.append(buffer, 0, count);
 			
 			return fileContent.toString();
 		} catch (IOException _e) {
