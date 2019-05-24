@@ -1,13 +1,25 @@
 package io.sarl.csharpgenerator.tests;
 
+import org.eclipse.xtext.util.Strings;
+import org.eclipse.xtext.validation.Issue;
 import org.junit.Test;
+
+import io.sarl.lang.SARLStandaloneSetup;
+import io.sarl.lang.SARLVersion;
+import io.sarl.lang.compiler.batch.SarlBatchCompiler;
+import io.sarl.lang.sarl.SarlPackage;
+
 import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
+import com.google.common.io.Files;
 
 @SuppressWarnings({ "javadoc", "static-method", "nls" })
 public class CSharpCompilationTest {
@@ -76,7 +88,7 @@ public class CSharpCompilationTest {
 		}
 	}
 	
-	private String toMultilineString(String... lines) {
+	private static String toMultilineString(String... lines) {
 		StringBuilder output = new StringBuilder();
 		
 		for (String line : lines)
@@ -86,16 +98,106 @@ public class CSharpCompilationTest {
 		return output.toString();
 	}
 
-	private String fromMultilineString(String lines) {
+	private static String fromMultilineString(String lines) {
 		return toMultilineString(lines.split("[\r\n]+"));
 	}
 
+	private void compileSarlToCs(File inputSarlCode, File csCompilationOutputDirectory) {}
+	
+	public void runBatchCompiler(File basePath, File sourcePath, File sarlcOutputFolder, File javacOutputFolder, File tempFolder) throws Exception {
+		@SuppressWarnings("null")
+		final SarlBatchCompiler compiler = SARLStandaloneSetup.doSetup().getInstance(SarlBatchCompiler.class);
+		
+		compiler.setBasePath(basePath.getAbsolutePath());
+		compiler.setSourcePath(sourcePath.getAbsolutePath());
+		compiler.setOutputPath(sarlcOutputFolder);
+		compiler.setClassOutputPath(javacOutputFolder);
+		compiler.setTempDirectory(tempFolder);
+		compiler.setDeleteTempDirectory(false);
+		compiler.setJavaCompilerVerbose(false);
+		compiler.setGenerateInlineAnnotation(false);
+		compiler.setExtraLanguageGenerators(""); // TODO: Find out what to put in there...
+		compiler.setReportInternalProblemsAsIssues(true);
+		final List<Issue> issues = new ArrayList<>();
+		compiler.addIssueMessageListener((issue, uri, message) -> {
+			issues.add(issue);
+		});
+		if (!compiler.compile()) {
+			throw new RuntimeException("Compilation error: " + issues.toString());
+		}
+	}
+	
+	protected File makeFolder(File root, String... elements) {
+		File output = root;
+		for (final String element : elements) {
+			output = new File(output, element);
+		}
+		return output;
+	}
+
+	@Test
+	public void testCompilation() throws Exception {
+		File tempDirectory = new File("D:\\mplessy\\TO52\\__tmp__");
+		tempDirectory.mkdirs();
+		try {
+			// Create folders
+			File sourceDirectory = new File(tempDirectory, "src");
+			sourceDirectory.mkdirs();
+			File sarlcOutputDirectory = new File(tempDirectory, "src-gen");
+			sarlcOutputDirectory.mkdirs();
+			File buildDirectory = new File(tempDirectory, "build");
+			buildDirectory.mkdirs();
+			File javacOutputDirectory = new File(tempDirectory, "bin");
+			javacOutputDirectory.mkdirs();
+			// Create source file
+			File sarlFile = new File(sourceDirectory, "test.sarl");
+			Files.write(SARL_CODE.getBytes(), sarlFile);
+			// Compile
+			runBatchCompiler(tempDirectory, sourceDirectory, sarlcOutputDirectory, javacOutputDirectory, buildDirectory);
+			// Check result
+			File javaFile = makeFolder(sarlcOutputDirectory, "test", "Cat.java");
+			assertEquals(JAVA_CODE, fromMultilineString(readFileContent(javaFile)));
+		} finally {}
+	}
+	
+	public static String getLineSeparator() {
+		final String nl = System.getProperty("line.separator");
+		if (nl == null || nl.isEmpty()) {
+			return "\n";
+		}
+		return nl;
+	}
+	
+	private static final String SARL_CODE = toMultilineString(
+			"package test",
+			"class Cat {",
+			"}"
+			);
+
+	private static final String JAVA_CODE = toMultilineString(
+			"package test;", 
+			"", 
+			"import io.sarl.lang.annotation.SarlElementType;", 
+			"import io.sarl.lang.annotation.SarlSpecification;", 
+			"import io.sarl.lang.annotation.SyntheticMember;", 
+			"", 
+			"@SarlSpecification(\"0.9\")", 
+			"@SarlElementType(10)", 
+			"@SuppressWarnings(\"all\")", 
+			"public class Cat {", 
+			"  @SyntheticMember", 
+			"  public Cat() {", 
+			"    super();", 
+			"  }", 
+			"}"
+			);
+	
 	// TODO
 	// ----
 	// 'src/test/resources/io/sarl/csharpgenerator/tests' ... OK
 	// INTO child directories ............................... OK
 	// INTO 'input.sarl' and 'expected-output/' ............. OK
-	// INTO compile to C#
+	// INTO compile to C# ........................................................ @see L119
 	// INTO generated output to tmp dir
 	// INTO compare with 'expected-output/**/*'
 	// INTO junit 5 test factory
