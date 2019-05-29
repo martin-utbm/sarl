@@ -17,6 +17,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 import com.google.common.io.Files;
@@ -235,5 +237,89 @@ public class CSharpCompilationTest {
 			"class Cat",
 			""
 		), fromMultilineString(input));
+	}
+	
+	@Test
+	public void many_fs_so_compare() {
+		assertFileSystem(
+			getTestCases().findFirst().get().expectedOutput,
+			new File(getTestCases().findFirst().get().expectedOutput.getParentFile(), "test-actual")
+		);
+	}
+	
+	private void assertFileSystem(File expected, File actual) {
+		assertTrue("'" + expected.getAbsolutePath() + "' does not exist.", expected.exists());
+		assertTrue("'" + actual.getAbsolutePath() + "' does not exist.", actual.exists());
+		
+		assertFile(expected, actual);
+	}
+	
+	/**
+	 * PRE 'expected' and 'actual' both exist.
+	 */
+	private void assertFile(File expected, File actual) {
+		if (expected.isFile() && actual.isFile())
+			assertRegularFile(expected, actual);
+		
+		else if (expected.isDirectory() && actual.isDirectory())
+			assertDirectory(expected, actual);
+		
+		else
+			fail("'" + expected.getAbsolutePath() + "' and '" + actual.getAbsolutePath() + "' are not both files or directories.");
+	}
+	
+	/**
+	 * PRE 'expected' and 'actual' are both regular text files, i.e. no links, no binaries.
+	 * 
+	 * POST 'expected' and 'actual' both have the same size.
+	 * POST 'expected' and 'actual' both have the same text content.
+	 *
+	 * POST Positions 'expected' and 'actual' in the FS are not taken into account.
+	 * POST File names of 'expected' and 'actual' are not taken into account.
+	 */
+	private void assertRegularFile(File expected, File actual) {
+		assertEquals("'" + expected.getAbsolutePath() + "' and '" + actual.getAbsolutePath() + "' have different sizes.",
+			expected.length(),
+			actual.length()
+		);
+		
+		assertEquals("'" + expected.getAbsolutePath() + "' and '" + actual.getAbsolutePath() + "' have different contents.",
+			fromMultilineString(readFileContent(expected)),
+			fromMultilineString(readFileContent(actual))
+		);
+	}
+	
+	/**
+	 * PRE 'expected' and 'actual' are both directories, i.e. no links.
+	 * 
+	 * POST 'expected' and 'actual' have the same recursive structures.
+	 * POST Child files are asserted on names and numbers.
+	 *
+	 * POST Positions 'expected' and 'actual' in the FS are not taken into account.
+	 * POST File names of 'expected' and 'actual' are not taken into account.
+	 */
+	private void assertDirectory(File expected, File actual) {
+		File[] expectedChildren = expected.listFiles();
+		File[] actualChildren = actual.listFiles();
+		
+		assertEquals("'" + expected.getAbsolutePath() + "' and '" + actual.getAbsolutePath() + "' have different number of children.",
+			expectedChildren.length,
+			actualChildren.length
+		);
+		
+		Arrays.sort(expectedChildren, (left, right) -> left.getName().compareTo(right.getName()));
+		Arrays.sort(actualChildren, (left, right) -> left.getName().compareTo(right.getName()));
+		
+		for (int i = 0; i < expectedChildren.length; ++i) {
+			File expectedChild = expectedChildren[i];
+			File actualChild = actualChildren[i];
+			
+			assertEquals("'" + expectedChild.getAbsolutePath() + "' and '" + actualChild.getAbsolutePath() + "' have different names.",
+				expectedChild.getName(),
+				actualChild.getName()
+			);
+			
+			assertFile(expectedChild, actualChild);
+		}
 	}
 }
