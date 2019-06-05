@@ -12,7 +12,7 @@ namespace tests
 			this.name = name;
 			this.bellyCapacity = bellyCapacity;
 			this.bellyContent = bellyCapacity / 2;
-			this.isGrumpy = !true;
+			this.isGrumpy = false;
 		}
 	}
 }
