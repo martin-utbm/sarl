@@ -24,40 +24,15 @@ import io.sarl.lang.compiler.batch.SarlBatchCompiler;
 
 @SuppressWarnings({ "javadoc", "static-method", "nls" })
 public final class CSharpCompilationTest {
-	private static final String SARL_CODE = toMultilineString(
-			"package test",
-			"class Cat {",
-			"}"
-			);
-
-	private static final String JAVA_CODE = toMultilineString(
-			"package test;", 
-			"", 
-			"import io.sarl.lang.annotation.SarlElementType;", 
-			"import io.sarl.lang.annotation.SarlSpecification;", 
-			"import io.sarl.lang.annotation.SyntheticMember;", 
-			"", 
-			"@SarlSpecification(\"0.9\")", 
-			"@SarlElementType(10)", 
-			"@SuppressWarnings(\"all\")", 
-			"public class Cat {", 
-			"  @SyntheticMember", 
-			"  public Cat() {", 
-			"    super();", 
-			"  }", 
-			"}"
-			);
-	
 	// TODO
 	// ----
 	// 'src/test/resources/io/sarl/csharpgenerator/tests' ... OK
 	// INTO child directories ............................... OK
 	// INTO 'input.sarl' and 'expected-output/' ............. OK
-	// INTO compile to C# ................................... BLOCKED
-	// INTO generated output to tmp dir ..................... WIP
-	// INTO compare with 'expected-output/**/*' ............. WIP
+	// INTO compile to C# ................................... OK
+	// INTO generated output to tmp dir ..................... OK
+	// INTO compare with 'expected-output/**/*' ............. OK
 	// INTO junit 5 test factory ............................ TODO
-	// + Refactor all those static methods...
 	
 	@Test
 	public void wow_such_test() {
@@ -88,7 +63,8 @@ public final class CSharpCompilationTest {
 		assertEquals(toMultilineString(
 			"package tests",
 			"",
-			"class Cat",
+			"class Cat {",
+			"}",
 			""
 		), fromMultilineString(input));
 	}
@@ -102,8 +78,13 @@ public final class CSharpCompilationTest {
 	}
 
 	@Test
-	public void testCompilation() throws Exception {
-		File tempDirectory = new File("D:\\mplessy\\TO52\\__tmp__"); // TODO: final File tempDirectory = Files.createTempDir();
+	public void testCsCompilation() throws Exception {
+		TestCase testCase = getTestCases()
+			.filter(it -> it.name.equals("compiling_empty_cat_class"))
+			.findFirst()
+			.get();
+		
+		final File tempDirectory = Files.createTempDir();
 		tempDirectory.mkdirs();
 		try {
 			// Create folders
@@ -117,12 +98,12 @@ public final class CSharpCompilationTest {
 			javacOutputDirectory.mkdirs();
 			// Create source file
 			File sarlFile = new File(sourceDirectory, "test.sarl");
-			Files.write(SARL_CODE.getBytes(), sarlFile);
+			Files.write(testCase.input.getBytes(), sarlFile);
 			// Compile
 			runBatchCompiler(tempDirectory, sourceDirectory, sarlcOutputDirectory, javacOutputDirectory, buildDirectory);
 			// Check result
-			File javaFile = getOrCreateFileRecursively(sarlcOutputDirectory, "test", "Cat.java");
-			assertEquals(JAVA_CODE, fromMultilineString(readFileContent(javaFile)));
+			File actualGeneratedCSharp = getOrCreateFileRecursively(tempDirectory, "target", "generated-sources", "csharp");
+			assertFileSystem(testCase.expectedOutput, actualGeneratedCSharp);
 		} finally {}
 	}
 
@@ -220,9 +201,9 @@ public final class CSharpCompilationTest {
 	private static String readFileContent(File file) {
 		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
 			StringBuilder fileContent = new StringBuilder();
+
 			char[] buffer = new char[1024];
 			int count = 0;
-			
 			while ((count = reader.read(buffer)) != -1)
 				fileContent.append(buffer, 0, count);
 			
@@ -263,10 +244,8 @@ public final class CSharpCompilationTest {
 	private static void assertFile(File expected, File actual) {
 		if (expected.isFile() && actual.isFile())
 			assertRegularFile(expected, actual);
-		
 		else if (expected.isDirectory() && actual.isDirectory())
 			assertDirectory(expected, actual);
-		
 		else
 			fail("'" + expected.getAbsolutePath() + "' and '" + actual.getAbsolutePath() + "' are not both files or directories.");
 	}
