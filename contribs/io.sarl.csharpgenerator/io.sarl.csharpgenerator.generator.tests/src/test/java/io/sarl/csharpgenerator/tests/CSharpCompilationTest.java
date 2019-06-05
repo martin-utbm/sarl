@@ -2,12 +2,6 @@ package io.sarl.csharpgenerator.tests;
 
 import static io.sarl.csharpgenerator.tests.utilities.FileSystemAssertions.assertFileSystem;
 import static io.sarl.csharpgenerator.tests.utilities.FileSystemUtilities.getFile;
-import static io.sarl.csharpgenerator.tests.utilities.FileSystemUtilities.readFileContent;
-import static io.sarl.csharpgenerator.tests.utilities.MultilineStrings.fromMultilineString;
-import static io.sarl.csharpgenerator.tests.utilities.MultilineStrings.toMultilineString;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +11,8 @@ import java.util.stream.Stream;
 
 import com.google.common.io.Files;
 import org.eclipse.xtext.validation.Issue;
-import org.junit.Test;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 
 import io.sarl.csharpgenerator.generator.CsharpContribution;
 import io.sarl.csharpgenerator.tests.utilities.TestCase;
@@ -26,73 +21,16 @@ import io.sarl.lang.compiler.batch.SarlBatchCompiler;
 
 @SuppressWarnings({ "javadoc", "static-method", "nls" })
 public class CSharpCompilationTest {
-	// TODO
-	// ----
-	// 'src/test/resources/io/sarl/csharpgenerator/tests' ... OK
-	// INTO child directories ............................... OK
-	// INTO 'input.sarl' and 'expected-output/' ............. OK
-	// INTO compile to C# ................................... OK
-	// INTO generated output to tmp dir ..................... OK
-	// INTO compare with 'expected-output/**/*' ............. OK
-	// INTO junit 5 test factory ............................ TODO
-	
-	@Test
-	public void wow_such_test() {
-		assertTrue(true);
+	@TestFactory
+	public Stream<DynamicTest> csCompilation() {
+		return getTestCases()
+			.map(testCase -> DynamicTest.dynamicTest(testCase.name, () -> {
+				final File csOutputDirectory = compileSarlToCs(testCase.input);
+
+				assertFileSystem(testCase.expectedOutput, csOutputDirectory);
+			}));
 	}
 	
-	@Test
-	public void very_folder_listing() {
-		String[] subFolders = getTestCases()
-			.map(testCase -> testCase.name)
-			.toArray(String[]::new);
-		
-		assertArrayEquals(new String[] {
-			"compiling_cat_class_with_properties",
-			"compiling_cat_class_with_properties_and_methods",
-			"compiling_empty_cat_class"
-		}, subFolders);
-	}
-	
-	@Test
-	public void such_input() {
-		String input = readFileContent(
-			getTestCases()
-				.filter(it -> it.name.equals("compiling_empty_cat_class"))
-				.findFirst()
-				.get()
-				.input
-		);
-		
-		assertEquals(toMultilineString(
-			"package tests",
-			"",
-			"class Cat {",
-			"}",
-			""
-		), fromMultilineString(input));
-	}
-	
-	@Test
-	public void many_fs_so_compare() {
-		assertFileSystem(
-			getTestCases().findFirst().get().expectedOutput,
-			new File(getTestCases().findFirst().get().expectedOutput.getParentFile(), "test-actual")
-		);
-	}
-
-	@Test
-	public void testCsCompilation() throws Exception {
-		TestCase testCase = getTestCases()
-			.filter(it -> it.name.equals("compiling_empty_cat_class"))
-			.findFirst()
-			.get();
-
-		File csCompilationOutputDirectory = compileSarlToCs(testCase.input);
-
-		assertFileSystem(testCase.expectedOutput, csCompilationOutputDirectory);
-	}
-
 	// -----------------------------------------------------------------
 	
 	private Stream<TestCase> getTestCases() {
@@ -106,6 +44,7 @@ public class CSharpCompilationTest {
 		File tempDirectory = Files.createTempDir();
 
 		tempDirectory.mkdirs();
+		tempDirectory.deleteOnExit();
 
 		File sourceDirectory = new File(tempDirectory, "src");
 		File generatedJavaDirectory = new File(tempDirectory, "src-gen");
