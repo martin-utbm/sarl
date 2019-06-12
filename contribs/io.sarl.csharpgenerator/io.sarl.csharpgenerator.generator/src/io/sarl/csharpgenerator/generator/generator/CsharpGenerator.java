@@ -381,7 +381,8 @@ public class CsharpGenerator extends AbstractExtraLanguageGenerator {
 			} else {
 				it.append("class "); //$NON-NLS-1$
 			}
-			it.append(typeName).append(" : ");//$NON-NLS-1$
+			it.append(typeName);
+			if (superTypes.isEmpty() == false) it.append(" : ");//$NON-NLS-1$
 
 			boolean isOtherSuperType = false;
 			boolean first = true;
