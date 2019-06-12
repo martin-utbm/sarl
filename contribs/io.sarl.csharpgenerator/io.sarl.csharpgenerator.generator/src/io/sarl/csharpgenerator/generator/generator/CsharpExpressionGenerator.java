@@ -500,19 +500,47 @@ public class CsharpExpressionGenerator extends AbstractExpressionGenerator {
 			boolean closeequals=false;
 			switch (operator) {
 			case "-": //$NON-NLS-1$
+				it.append(" - "); //$NON-NLS-1$
+				break;
 			case "+": //$NON-NLS-1$
+				it.append(" + "); //$NON-NLS-1$
+				break;
 			case "*": //$NON-NLS-1$
+				it.append(" * "); //$NON-NLS-1$
+				break;
 			case "/": //$NON-NLS-1$
+				it.append(" / "); //$NON-NLS-1$
+				break;
 			case "%": //$NON-NLS-1$
+				it.append(" % "); //$NON-NLS-1$
+				break;
 			case "-=": //$NON-NLS-1$
+				it.append(" -= "); //$NON-NLS-1$
+				break;
 			case "+=": //$NON-NLS-1$
+				it.append(" += "); //$NON-NLS-1$
+				break;
 			case "*=": //$NON-NLS-1$
+				it.append(" *= "); //$NON-NLS-1$
+				break;
 			case "/=": //$NON-NLS-1$
+				it.append(" /= "); //$NON-NLS-1$
+				break;
 			case "%=": //$NON-NLS-1$
+				it.append(" %= "); //$NON-NLS-1$
+				break;
 			case "<": //$NON-NLS-1$
+				it.append(" < "); //$NON-NLS-1$
+				break;
 			case ">": //$NON-NLS-1$
+				it.append(" > "); //$NON-NLS-1$
+				break;
 			case "<=": //$NON-NLS-1$
+				it.append(" <= "); //$NON-NLS-1$
+				break;
 			case ">=": //$NON-NLS-1$
+				it.append(" >= "); //$NON-NLS-1$
+				break;
 			case "==": //$NON-NLS-1$
 				//FIXME test null reference case
 				it.append(".Equals("); //$NON-NLS-1$
@@ -521,6 +549,7 @@ public class CsharpExpressionGenerator extends AbstractExpressionGenerator {
 			case "!=": //$NON-NLS-1$
 				it.append(".Equals("); //$NON-NLS-1$
 				closeequals=true;
+				break;
 			case "<<": //$NON-NLS-1$
 			case ">>": //$NON-NLS-1$
 				it.append(" ").append(operator).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
