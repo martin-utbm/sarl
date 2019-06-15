@@ -1,0 +1,35 @@
+package tests
+
+class Cat {
+	val name : String
+	val bellyCapacity : int
+
+	var bellyContent : int
+	var isGrumpy : boolean
+
+	new(name : String, bellyCapacity : int) {
+		this.name = name
+		this.bellyCapacity = bellyCapacity
+
+		this.bellyContent = bellyCapacity / 2
+		this.isGrumpy = false
+	}
+
+	def meow : String {
+		assertIsHungry
+
+		"[" + name + "] " + computeMeow
+	}
+	
+	private def assertIsHungry {
+		// A cat is always hungry...
+	}
+	
+	private def computeMeow : String {
+		if (isGrumpy || bellyContent < 0.1 * bellyCapacity) {
+			"MEOW!"
+		} else {
+			"Meow."
+		}
+	}
+}
